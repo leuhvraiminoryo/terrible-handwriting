@@ -18,14 +18,19 @@ def decomp(image_path, lastpart, char_size_x=20, char_size_y=20, bg_color=(0,0,0
     full_image = surf.copy()
     full_image.set_colorkey((255,255,255))
     num = 0
+    file = open("data/shite.csv", "a")
     for char in low_letters:
         full_image.set_clip(pygame.Rect(((char_size_x+1)*num),0,char_size_x,char_size_y))
         letter_image = full_image.subsurface(full_image.get_clip())
-        name = f"data/train_pics/{char}{lastpart}"
-        pygame.image.save(letter_image, name)
-        # todo : add corresponding line to csv
+        name = char + lastpart
+        path_name = "data/train_pics/"+name
+        pygame.image.save(letter_image, path_name)
+        file.write(name+","+str(ord(char)-ord("a"))+"\n")
         num += 1
 
 def load_all_strips(dir_path):
+
+    open("data/shite.csv","w").close() # clearing the csv file
+
     for strip in os.listdir(dir_path):
         decomp(os.path.join(dir_path, strip), strip.split("_")[-1])

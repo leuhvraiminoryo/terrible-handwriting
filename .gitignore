@@ -1,3 +1,10 @@
+# specific stuff
+
+data/
+
+
+# ---------- HERE STARTS THE AUTO-CREATED "python template" GITIGNORE -------
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
