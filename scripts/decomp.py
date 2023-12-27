@@ -1,11 +1,14 @@
 # this file's purpose is to correctly decompose a lowercase-full-alphabet long pic into its individual letters
 # using pygame.image cuz I know how to use it for such a goal, eh
 
-import pygame
+import pygame, os
+
+pygame.display.init()
+pygame.display.set_mode()
 
 low_letters = [chr(ord('a')+i) for i in range(26)]
 
-def decomp(image_path, series_id, char_size_x=20, char_size_y=20, bg_color=(0,0,0)):
+def decomp(image_path, lastpart, char_size_x=20, char_size_y=20, bg_color=(0,0,0)):
     print(low_letters)
     full_image = pygame.image.load(image_path).convert()
     surf = pygame.Surface((full_image.get_width(),full_image.get_height())).convert()
@@ -15,9 +18,14 @@ def decomp(image_path, series_id, char_size_x=20, char_size_y=20, bg_color=(0,0,
     full_image = surf.copy()
     full_image.set_colorkey((255,255,255))
     num = 0
-    for char in FontOrder:
-        full_image.set_clip(pygame.Rect(((TileSize+1)*num),0,char_size_x,char_size_y))
+    for char in low_letters:
+        full_image.set_clip(pygame.Rect(((char_size_x+1)*num),0,char_size_x,char_size_y))
         letter_image = full_image.subsurface(full_image.get_clip())
-        # todo : save letter_image with correct "char" + id number name, and add corresponding line to csv
+        name = f"data/train_pics/{char}{lastpart}"
+        pygame.image.save(letter_image, name)
+        # todo : add corresponding line to csv
         num += 1
 
+def load_all_strips(dir_path):
+    for strip in os.listdir(dir_path):
+        decomp(os.path.join(dir_path, strip), strip.split("_")[-1])

@@ -5,6 +5,7 @@ import torch
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
 
+'''
 c = ds.CustomImageDataset("data/shite.csv", "data/train_pics")
 
 labels_map = {0 : "a", 1 : "b", 2 : "c"}
@@ -21,3 +22,7 @@ for i in range(1, cols * rows + 1):
 plt.show()
 
 training_dataloader = DataLoader(c, batch_size=2, shuffle=True)
+'''
+
+import scripts.decomp as dec 
+dec.load_all_strips("alphabet_strips/")
