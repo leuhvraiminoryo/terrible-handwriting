@@ -58,13 +58,14 @@ images, labels = next(dataiter)
 
 classes = [chr(ord("a")+i) for i in range(26)]
 
+'''
 # show images
 imshow(torchvision.utils.make_grid(images))
-# print labels
+# labels
 print(' '.join(f'{classes[labels[j]]:5s}' for j in range(bs)))
+'''
 
-
-for epoch in range(15):  # loop over the dataset multiple times
+for epoch in range(30):  # loop over the dataset multiple times
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
@@ -106,8 +107,9 @@ im_ten = image_tensor.type(torch.float)
 transform = transforms.Compose([transforms.Normalize((0.5,), (0.5,))])
 im_ten = transform(im_ten)
 
-out = net.forward(im_ten)
-_, ind = out.max(1)
+for i in range(100):
+    out = net.forward(im_ten)
+    _, ind = out.max(1)
 
-print(classes[ind])
+    print(classes[ind])
 
