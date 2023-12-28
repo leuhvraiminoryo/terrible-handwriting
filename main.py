@@ -5,14 +5,12 @@ import torch
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
 
-
 import scripts.decomp as dec 
 dec.load_all_strips("alphabet_strips/")
 
-
 c = ds.CustomImageDataset("data/shite.csv", "data/train_pics")
 
-labels_map = {0 : "a", 1 : "b", 2 : "c"} #TODO: change that map stuff to have all letters
+labels_map = dict(zip([i for i in range(26)], [chr(ord("a") + i) for i in range(26)]))
 
 figure = plt.figure(figsize=(8, 8))
 cols, rows = 2, 2
