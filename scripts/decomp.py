@@ -9,7 +9,6 @@ pygame.display.set_mode()
 low_letters = [chr(ord('a')+i) for i in range(26)]
 
 def decomp(image_path, lastpart, char_size_x=20, char_size_y=20, bg_color=(0,0,0)):
-    print(low_letters)
     full_image = pygame.image.load(image_path).convert()
     surf = pygame.Surface((full_image.get_width(),full_image.get_height())).convert()
     surf.fill(bg_color)
@@ -29,6 +28,8 @@ def decomp(image_path, lastpart, char_size_x=20, char_size_y=20, bg_color=(0,0,0
         num += 1
 
 def load_all_strips(dir_path):
+
+    #TODO : create the directories if they do not exist
 
     open("data/shite.csv","w").close() # clearing the csv file
 
