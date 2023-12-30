@@ -65,7 +65,7 @@ imshow(torchvision.utils.make_grid(images))
 print(' '.join(f'{classes[labels[j]]:5s}' for j in range(bs)))
 '''
 
-for epoch in range(30):  # loop over the dataset multiple times
+for epoch in range(20):  # loop over the dataset multiple times
 
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
@@ -83,8 +83,8 @@ for epoch in range(30):  # loop over the dataset multiple times
 
         # statistics
         running_loss += loss.item()
-        if i % 200 == 199:    # print every 200 mini-batches
-            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 2000:.3f}')
+        if i % 20 == 19:
+            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20:.3f}')
             running_loss = 0.0
 
 print('Finished Training')
@@ -107,9 +107,8 @@ im_ten = image_tensor.type(torch.float)
 transform = transforms.Compose([transforms.Normalize((0.5,), (0.5,))])
 im_ten = transform(im_ten)
 
-for i in range(100):
-    out = net.forward(im_ten)
-    _, ind = out.max(1)
+out = net.forward(im_ten)
+_, ind = out.max(1)
 
-    print(classes[ind])
+print(classes[ind])
 
