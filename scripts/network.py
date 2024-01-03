@@ -1,8 +1,9 @@
 import torch.nn as nn
 import torch.nn.functional as F
-import dataset as ds
+import scripts.dataset as ds
 from torch.utils.data import DataLoader
 import torch
+import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from PIL import Image
@@ -24,77 +25,71 @@ class Net(nn.Module):
         logits = self.linear_relu_stack(x)
         return logits
 
-net = Net()
-
-import torch.optim as optim
-
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-
-transform = transforms.Compose(
-    [transforms.Normalize((0.5,), (0.5,))])
-
-c = ds.CustomImageDataset("./data/train.csv", "./data/train_pics", transform=transform)
-bs=8
-trainloader = torch.utils.data.DataLoader(c, batch_size=bs, shuffle=True, num_workers=2)
-
-
-import matplotlib.pyplot as plt
-import numpy as np
-
-# functions to show an image
-def imshow(img):
-    img = img / 2 + 0.5     # unnormalize
-    npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
-    plt.show()
-
 classes = [chr(ord("a")+i) for i in range(26)]
+PATH = './letters_net.pth'
 
-for epoch in range(10):  # loop over the dataset multiple times
+def train_net():
+    net = Net()
 
-    running_loss = 0.0
-    for i, data in enumerate(trainloader, 0):
-        # get the inputs; data is a list of [inputs, labels]
-        inputs, labels = data
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
-        # zero the parameter gradients
-        optimizer.zero_grad()
+    transform = transforms.Compose(
+        [transforms.Normalize((0.5,), (0.5,))])
 
-        # forward + backward + optimize
-        outputs = net(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
+    c = ds.CustomImageDataset("./data/train.csv", "./data/train_pics", transform=transform)
+    bs=8
+    trainloader = torch.utils.data.DataLoader(c, batch_size=bs, shuffle=True, num_workers=2)
 
-        # statistics
-        running_loss += loss.item()
-        if i % 20 == 19:
-            print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20:.3f}')
-            running_loss = 0.0
+    for epoch in range(10):  # loop over the dataset multiple times
 
-print('Finished Training')
+        running_loss = 0.0
+        for i, data in enumerate(trainloader, 0):
+            # get the inputs; data is a list of [inputs, labels]
+            inputs, labels = data
 
-# saving
-'''PATH = './letters_net.pth'
-torch.save(net.state_dict(), PATH)'''
+            # zero the parameter gradients
+            optimizer.zero_grad()
 
-# loading 
-'''net = Net()
-net.load_state_dict(torch.load(PATH))'''
+            # forward + backward + optimize
+            outputs = net(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
 
-transform = transforms.Compose([transforms.PILToTensor()])
+            # statistics
+            running_loss += loss.item()
+            if i % 20 == 19:
+                print(f'[{epoch + 1}, {i + 1:5d}] loss: {running_loss / 20:.3f}')
+                running_loss = 0.0
 
-im = Image.open("./to_predict.png")
-image_tensor = transform(im)
+    print('Finished Training')
 
-im_ten = image_tensor.type(torch.float)
+    torch.save(net.state_dict(), PATH)
 
-transform = transforms.Compose([transforms.Normalize((0.5,), (0.5,))])
-im_ten = transform(im_ten)
 
-out = net.forward(im_ten)
-_, ind = out.max(1)
+def get_network(retrain=False):
+    if retrain:
+        train_net()
 
-print(classes[ind])
+    net = Net()
+    net.load_state_dict(torch.load(PATH))
+
+    return net
+
+def test_single_image(network, path="to_predict.png"):
+    transform = transforms.Compose([transforms.PILToTensor()])
+
+    im = Image.open(path)
+    image_tensor = transform(im)
+
+    im_ten = image_tensor.type(torch.float)
+
+    transform = transforms.Compose([transforms.Normalize((0.5,), (0.5,))])
+    im_ten = transform(im_ten)
+
+    out = network.forward(im_ten)
+    _, ind = out.max(1)
+
+    print(f"predicted for {path} : {classes[ind]}")
 
