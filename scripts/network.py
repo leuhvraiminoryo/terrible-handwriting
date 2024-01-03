@@ -58,13 +58,6 @@ images, labels = next(dataiter)
 
 classes = [chr(ord("a")+i) for i in range(26)]
 
-'''
-# show images
-imshow(torchvision.utils.make_grid(images))
-# labels
-print(' '.join(f'{classes[labels[j]]:5s}' for j in range(bs)))
-'''
-
 for epoch in range(20):  # loop over the dataset multiple times
 
     running_loss = 0.0
