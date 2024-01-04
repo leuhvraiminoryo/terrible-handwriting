@@ -27,6 +27,7 @@ class Net(nn.Module):
 
 classes = [chr(ord("a")+i) for i in range(26)]
 PATH = 'aux/letters_net.pth'
+
 transform = transforms.Compose(
         [transforms.Normalize((0.5,), (0.5,))])
 
@@ -77,8 +78,9 @@ def get_network(retrain=False):
     return net
 
 def test(net):
-    correct = 0
-    total = 0
+    correct_pred = {classname: 0 for classname in classes}
+    total_pred = {classname: 0 for classname in classes}
+
     c = ds.CustomImageDataset("data/test.csv", "data/test_pics", transform=transform)
     bs=8
     testloader = torch.utils.data.DataLoader(c, batch_size=bs, shuffle=True, num_workers=2)
@@ -90,10 +92,18 @@ def test(net):
             outputs = net(images)
             # the class with the highest energy is what we choose as prediction
             _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
+            for label, prediction in zip(labels, predicted):
+                if label == prediction:
+                    correct_pred[classes[label]] += 1
+                total_pred[classes[label]] += 1
 
+    total = sum(total_pred.values())
+    correct = sum(correct_pred.values())
     print(f'Accuracy of the network on the {total} test images: {100 * correct // total} %')
+
+    for classname, correct_count in correct_pred.items():
+        accuracy = 100 * float(correct_count) / total_pred[classname]
+        print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
 
 def test_single_image(network, path="aux/to_predict.png"):
     transform = transforms.Compose([transforms.PILToTensor()])

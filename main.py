@@ -11,8 +11,8 @@ import scripts.network as net
 traite les images en 'alphabet_strips/' pour remplir/remplacer les éléments du dossier 'data/'
 à ne décommenter que si nécessaire
 '''
-dec.treat_data("alphabet_strips/")
+#dec.treat_data("alphabet_strips/")
 
-nn = net.get_network(True)
+nn = net.get_network()
 net.test_single_image(nn)
 net.test(nn)
