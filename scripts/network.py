@@ -26,7 +26,7 @@ class Net(nn.Module):
         return logits
 
 classes = [chr(ord("a")+i) for i in range(26)]
-PATH = './letters_net.pth'
+PATH = 'aux/letters_net.pth'
 
 def train_net():
     net = Net()
@@ -77,7 +77,7 @@ def get_network(retrain=False):
 
     return net
 
-def test_single_image(network, path="to_predict.png"):
+def test_single_image(network, path="aux/to_predict.png"):
     transform = transforms.Compose([transforms.PILToTensor()])
 
     im = Image.open(path)
