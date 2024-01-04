@@ -27,6 +27,8 @@ class Net(nn.Module):
 
 classes = [chr(ord("a")+i) for i in range(26)]
 PATH = 'aux/letters_net.pth'
+transform = transforms.Compose(
+        [transforms.Normalize((0.5,), (0.5,))])
 
 def train_net():
     net = Net()
@@ -34,10 +36,7 @@ def train_net():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 
-    transform = transforms.Compose(
-        [transforms.Normalize((0.5,), (0.5,))])
-
-    c = ds.CustomImageDataset("./data/train.csv", "./data/train_pics", transform=transform)
+    c = ds.CustomImageDataset("data/train.csv", "data/train_pics", transform=transform)
     bs=8
     trainloader = torch.utils.data.DataLoader(c, batch_size=bs, shuffle=True, num_workers=2)
 
@@ -76,6 +75,25 @@ def get_network(retrain=False):
     net.load_state_dict(torch.load(PATH))
 
     return net
+
+def test(net):
+    correct = 0
+    total = 0
+    c = ds.CustomImageDataset("data/test.csv", "data/test_pics", transform=transform)
+    bs=8
+    testloader = torch.utils.data.DataLoader(c, batch_size=bs, shuffle=True, num_workers=2)
+    # since we're not training, we don't need to calculate the gradients for our outputs
+    with torch.no_grad():
+        for data in testloader:
+            images, labels = data
+            # calculate outputs by running images through the network
+            outputs = net(images)
+            # the class with the highest energy is what we choose as prediction
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+    print(f'Accuracy of the network on the {total} test images: {100 * correct // total} %')
 
 def test_single_image(network, path="aux/to_predict.png"):
     transform = transforms.Compose([transforms.PILToTensor()])
