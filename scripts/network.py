@@ -103,7 +103,7 @@ def test(net):
 
     for classname, correct_count in correct_pred.items():
         accuracy = 100 * float(correct_count) / total_pred[classname]
-        print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
+        print(f'Accuracy for class:  {classname:2s} is {accuracy:.1f} %')
 
 def test_single_image(network, path="aux/to_predict.png"):
     transform = transforms.Compose([transforms.PILToTensor()])
